@@ -18,7 +18,8 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
                   verbose=False, readout_steps=2, kwargs_realization_other={},
                   ray_tracing_optimization='default', test_mode=False,
                   statistic_type='METRIC_DISTANCE', save_realizations=False, kwargs_preset_lens={},
-                  crit_curves_in_test_mode=False):
+                  crit_curves_in_test_mode=False,
+                  save_macromodel_params=True):
 
     """
     This function generates samples from a posterior distribution p(q | d) where q is a set of parameters and d
@@ -410,6 +411,15 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
                                                           parameter_array[idx_system,:])
                     f = open(filename_realizations + 'simulation_output_' + str(idx_system + idx_init + 1), 'wb')
                     dill.dump(container, f)
+                    
+            if save_macromodel_params:
+                for idx_system, system in enumerate(saved_lens_systems):
+
+                    macromodel = system.macromodel
+                    #container.lens_system.macromodel
+                    f = open(filename_realizations + 'macromodel_output_' + str(idx_system + idx_init + 1), 'wb')
+                    dill.dump(macromodel, f)
+            idx_init += len(saved_lens_systems)
 
             idx_init += len(saved_lens_systems)
 
