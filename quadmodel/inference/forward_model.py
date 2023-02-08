@@ -48,7 +48,7 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
     :param kwargs_sample_macromodel: keyword arguments for sampling macromodel parameters;
     currently only multipole amplitudes implemented
     :param verbose: determines how much output to print while running the inference
-    :param readout_steps: determines how often output is printed to a file
+    :param readout_steps: determines how often output is printed to a file (should be bigger than 1, for this version of the code...)
     :param kwargs_realization_other: additional keyword arguments to be passed into a pyHalo preset model
     :param ray_tracing_optimization: sets the method used to perform ray tracing
     :param test_mode: prints output and generates plots of image positions and convergence maps
@@ -64,7 +64,7 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
     if os.path.exists(output_path) is False:
         proc = subprocess.Popen(['mkdir', output_path])
         proc.wait()
-    if os.path.exists(output_path + 'job_' + str(job_index)) is False:
+    if os.path.exists(os.path.join(output_path, 'job_' + str(job_index))) is False:
         proc = subprocess.Popen(['mkdir', output_path + 'job_' + str(job_index)])
         proc.wait()
 
@@ -389,10 +389,12 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
                     f.write(param_name_string+'\n')
                     write_param_names = False
 
-                nrows, ncols = int(parameter_array.shape[0]), int(parameter_array.shape[1])
+                nrows, ncols = int(parameter_array.shape[0]), int(parameter_array.shape[1]) #can make an error if
+                # parameter_array is only one dim (no shape[1]) -> so the reshape command was added
 
                 for row in range(0, nrows):
                     for col in range(0, ncols):
+                        print(parameter_array)
                         f.write(str(np.round(parameter_array[row, col], 6)) + ' ')
                     f.write('\n')
 
@@ -419,7 +421,6 @@ def forward_model(output_path, job_index, lens_data, n_keep, kwargs_sample_reali
                     #container.lens_system.macromodel
                     f = open(filename_realizations + 'macromodel_output_' + str(idx_system + idx_init + 1), 'wb')
                     dill.dump(macromodel, f)
-            idx_init += len(saved_lens_systems)
 
             idx_init += len(saved_lens_systems)
 

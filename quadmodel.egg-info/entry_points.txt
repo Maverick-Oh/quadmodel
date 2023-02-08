@@ -1,0 +1,2 @@
+[console_scripts]
+quadmodel = quadmodel.cli:main
